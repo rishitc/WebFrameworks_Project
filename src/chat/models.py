@@ -1,7 +1,7 @@
 from django.db import models
 
 from django.conf import settings
-from django.db import models
+
 from django.db.models import Q
 
 
@@ -16,19 +16,21 @@ class ThreadManager(models.Manager):
         username = user.username
         if username == other_username:
             return None
-        qlookup1 = Q(first__username=username) & Q(second__username=other_username)
-        qlookup2 = Q(first__username=other_username) & Q(second__username=username)
+        qlookup1 = Q(first__username=username) &\
+            Q(second__username=other_username)
+        qlookup2 = Q(first__username=other_username) &\
+            Q(second__username=username)
         qs = self.get_queryset().filter(qlookup1 | qlookup2).distinct()
         if qs.count() == 1:
             return qs.first(), False
         elif qs.count() > 1:
             return qs.order_by('timestamp').first(), False
         else:
-            Klass = user.__class__
-            user2 = Klass.objects.get(username=other_username)
+            User_Model_Class = user.__class__
+            user2 = User_Model_Class.objects.get(username=other_username)
             if user != user2:
                 obj = self.model(
-                        first=user, 
+                        first=user,
                         second=user2
                     )
                 obj.save()
@@ -37,12 +39,16 @@ class ThreadManager(models.Manager):
 
 
 class Thread(models.Model):
-    first        = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='chat_thread_first')
-    second       = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='chat_thread_second')
-    updated      = models.DateTimeField(auto_now=True)
-    timestamp    = models.DateTimeField(auto_now_add=True)
+    first = models.ForeignKey(settings.AUTH_USER_MODEL,
+                              on_delete=models.CASCADE,
+                              related_name='chat_thread_first')
+    second = models.ForeignKey(settings.AUTH_USER_MODEL,
+                               on_delete=models.CASCADE,
+                               related_name='chat_thread_second')
+    updated = models.DateTimeField(auto_now=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
-    objects      = ThreadManager()
+    objects = ThreadManager()
 
     @property
     def room_group_name(self):

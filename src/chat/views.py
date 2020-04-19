@@ -21,6 +21,7 @@ class ThreadView(LoginRequiredMixin, FormMixin, DetailView):
     template_name = 'chat/thread.html'
     form_class = ComposeForm
     success_url = './'
+    model = Thread
 
     def get_queryset(self):
         return Thread.objects.by_user(self.request.user)
