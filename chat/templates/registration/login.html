@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="p-3 mb-2 bg-dark text-white">
+<h1> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+&nbsp;LOGIN </h1>
+    <div class="container row justify-content-center">
+    <form method="POST">
+        {% csrf_token %}
+         &nbsp; &nbsp; &nbsp; &nbsp; {{form.as_p}}
+    </form>
+    </div>
+    <div class="container row justify-content-center">
+    <button> LOGIN</button>
+    </div>
+    </div>
+{% endblock %}

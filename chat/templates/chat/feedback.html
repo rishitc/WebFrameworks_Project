@@ -1,0 +1,28 @@
+{% extends 'base.html'%}
+{% block content %}
+            <h2 class=" row justify-content-center">New Feedback Form</h2>
+            <div class="container row justify-content-center">
+                <form method="POST">
+                    {% csrf_token %}
+                    {% for field in form%}
+                            <label class="label">{{field.html_name}}</label> &nbsp; &nbsp;
+                                {{field}} <p> </p> <p> </p> <p> </p> <p> </p> <p> </p> <p> </p> <p> </p>
+                    {% endfor %}
+                </form>
+            </div>
+            <div class="container row justify-content-center">
+                <!--<div class="alert alert-success" role="alert">
+                    <a href="#" class="alert-link">SAVE</a>-->
+            <button type="submit" class="save btn btn-default">SAVE</button>
+</div>
+                </div>
+{% endblock %}
+
+<!--<div class = "row justify-content-center">
+    <h2>New Feedback</h2>
+    <form method="POST">
+    {% csrf_token %}
+        {{ form.as_p }}
+        <input class="btn btn-primary" type="button" value="SAVE" align="center"></button>
+    </form>
+    </div> -->

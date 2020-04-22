@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="p-3 mb-2 bg-dark text-white">
+    <h1 class=" row justify-content-center"> CREATE A NEW ACCOUNT </h1>
+    <div class="container row justify-content-center">
+    <form method="POST">
+        {% csrf_token %}
+        {{form.as_p}}
+    </form>
+    </div>
+    <div class="container row justify-content-center">
+    <button type="button" class="btn btn-success">REGISTER</button>
+    </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,19 @@
+<html>
+<head>
+</head>
+<body>
+{% for post in posts %}
+    <div>
+        <h2>By: {{ post.name }} </h2>
+        <h2>Rating:{{ post.rating }}</h2>
+        <p>Comment:{{ post.text|linebreaksbr }}</p>
+    </div>
+{% endfor %}
+    <div>
+        Thank you for your valuable feedback!
+    </div>
+    <div class="alert alert-primary" role="alert">
+    Go back to <a href="{% url 'login'%}" class="alert-link">Login</a> page </div>
+</div>
+</body>
+</html>

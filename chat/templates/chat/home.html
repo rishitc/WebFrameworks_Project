@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class=" row justify-content-center">Welcome Home</h2>
+<div class=" row justify-content-center"> Our application ChitChat is a web-framework based service. User can visit any particular chat room of his choice and use this service. The communication is
+securely carried out with the help of WebSockets. </div>
+<div class="alert alert-primary" role="alert">
+    Want to ChitChat? You can <a href="{% url 'login'%}" class="alert-link">Login</a> here
+</div> &nbsp; &nbsp; &nbsp; 
+<div class="alert alert-success" role="alert">
+  Not registered yet? <a href="{% url 'register'%}" class="alert-link">Register</a> here
+</div>
+{% endblock %}
