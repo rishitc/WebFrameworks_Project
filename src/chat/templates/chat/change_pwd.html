@@ -2,7 +2,26 @@
 
 {% block style %}
     {% include 'CSS/signup_css.html' %}
+    {% include 'CSS/profileIcon_css.html' %}
     {% include 'CSS/div_alert_css.html'%}
+{% endblock %}
+
+{% block headings %}
+    {% include 'chat/profileIcon.html' %}
+{%endblock%}
+
+{% block dropdown %}
+    <!--the dropdown menu-->
+    <div class="list-group profile-icon-list-group">
+        <a href="{% url 'chat:profile' %}" class="list-group-item list-group-item-action profile-icon-dropdown-hide">Profile</a>
+        <a href="{% url 'chat:logout' %}" class="list-group-item list-group-item-action profile-icon-dropdown-hide">Logout</a>
+    </div>
+
+    <!-- Hidden Logout form -->
+    <form action="{% url 'chat:logout' %}" method="post" class="logout-form">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
 {% endblock %}
 
 {% block content %}
@@ -22,7 +41,7 @@
                     </svg>
                 </button>
             </div>
-            <div class="p2">
+            <div class="p-2">
                 <button type="button" class="btn btn-dark" id="reset-pwd-email" data-toggle="tooltip" data-placement="top" title="You will be logged out. To complete this action!">
                     {{btnName_email}}
                     <svg class="bi bi-envelope" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -52,4 +71,5 @@
 
 {% block script %}
     {% include 'clientSideJS/change_pwd_js.html' %}
+    {% include 'clientSideJS/profileIcon_js.html' %}
 {% endblock %}

@@ -10,7 +10,7 @@
     <form method="post" enctype="multipart/form-data">{% csrf_token %}
         {{EditForm|crispy}}
         <hr>
-        
+        {{ImageForm|crispy}}
         <br>
         <div class="d-flex justify-content-end">
             <div class="p-2">

@@ -248,12 +248,19 @@ def edit_profile(request):
 
     if request.method == "POST":
         user_form = EditUserProfileForm(request.POST, instance=request.user)
+        UserProfileImage = UserProfileImageForm(request.FILES, instance=request.user.userprofile)
         # print(UserForm.data)
         # userProfileImage_form = UserProfileImageForm(
         #     instance=userProfileImage_query)
 
         if user_form.is_valid():
-            user_form.save()
+            obj = user_form.save()
+
+            if request.FILES:
+                # setting the user filed for the form so that
+                # it save correctly
+                UserProfileImage.user = obj
+                UserProfileImage.save()
 
             # get the redirection url ready
             # /profile/
@@ -284,12 +291,12 @@ def edit_profile(request):
 
     else:
         user_form = EditUserProfileForm(instance=request.user)
-        # ImageForm = UserProfileImageForm(instance=userProfileImage_query)
+        ImageForm = UserProfileImageForm(instance=request.user.userprofile)
         return render(request, "chat/edit_profile.html",
                       {
                           'EditForm': user_form,
-                           # 'ImageForm': ImageForm,
-                           'page_name': 'Edit Profile'
+                          'ImageForm': ImageForm,
+                          'page_name': 'Edit Profile'
                       })
 
     return redirect('chat:profile')
