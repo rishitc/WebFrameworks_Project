@@ -323,6 +323,7 @@ def change_password(request):
             url = '{}?{}'.format(base_url, query_string)
             return redirect(url)
         else:
+            base_url = reverse('chat:change_password')
             # completing the redirection url ready
             query_string = urlencode({'status': 'failure_pwd_chg'})
 

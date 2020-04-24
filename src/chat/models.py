@@ -78,7 +78,7 @@ class ThreadManager(models.Manager):
                 thread_to_hide.visible_for_first = False
             else:
                 thread_to_hide.visible_for_second = False
-            
+
             thread_to_hide.save()
             # returing true to indicate successful
             # identification and removal
