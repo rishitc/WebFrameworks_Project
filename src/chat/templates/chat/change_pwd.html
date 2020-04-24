@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block style %}
+    {% include 'CSS/signup_css.html' %}
+    {% include 'CSS/div_alert_css.html'%}
+{% endblock %}
+
+{% block content %}
+    {% load crispy_forms_tags %}
+    <form method="post" enctype="multipart/form-data">{% csrf_token %}
+        {{PWD_Form|crispy}}
+        <hr>
+        
+        <br>
+        <div class="d-flex justify-content-end">
+            <div class="p-2">
+                <button type="submit" class="btn btn-primary">
+                    {{btnName_edit}}&nbsp;&nbsp;
+                    <svg class="bi bi-pencil" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M11.293 1.293a1 1 0 011.414 0l2 2a1 1 0 010 1.414l-9 9a1 1 0 01-.39.242l-3 1a1 1 0 01-1.266-1.265l1-3a1 1 0 01.242-.391l9-9zM12 2l2 2-9 9-3 1 1-3 9-9z" clip-rule="evenodd"/>
+                        <path fill-rule="evenodd" d="M12.146 6.354l-2.5-2.5.708-.708 2.5 2.5-.707.708zM3 10v.5a.5.5 0 00.5.5H4v.5a.5.5 0 00.5.5H5v.5a.5.5 0 00.5.5H6v-1.5a.5.5 0 00-.5-.5H5v-.5a.5.5 0 00-.5-.5H3z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="p2">
+                <button type="button" class="btn btn-dark" id="reset-pwd-email" data-toggle="tooltip" data-placement="top" title="You will be logged out. To complete this action!">
+                    {{btnName_email}}
+                    <svg class="bi bi-envelope" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M14 3H2a1 1 0 00-1 1v8a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1zM2 2a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H2z" clip-rule="evenodd"/>
+                        <path fill-rule="evenodd" d="M.071 4.243a.5.5 0 01.686-.172L8 8.417l7.243-4.346a.5.5 0 01.514.858L8 9.583.243 4.93a.5.5 0 01-.172-.686z" clip-rule="evenodd"/>
+                        <path d="M6.752 8.932l.432-.252-.504-.864-.432.252.504.864zm-6 3.5l6-3.5-.504-.864-6 3.5.504.864zm8.496-3.5l-.432-.252.504-.864.432.252-.504.864zm6 3.5l-6-3.5.504-.864 6 3.5-.504.864z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </form>
+
+
+    <!-- User alerts -->
+    <div class="alert alert-success on-load large" role="alert">
+        <p class="text-center font-weight-normal mb-0 pb-0">
+            {% if request.GET.status %}
+                {% if request.GET.status == 'failure_pwd_chg' %}
+                    Password could not be changed, Please try again!&nbsp;&nbsp;&#128561;
+                {% endif %}
+            {% else %}
+                Pro Tip: Longer and easier to remember passwords are better than short and confusing ones.&nbsp;&nbsp;&#129488;
+            {% endif %}
+        </p>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {% include 'clientSideJS/change_pwd_js.html' %}
+{% endblock %}

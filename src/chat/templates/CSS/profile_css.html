@@ -1,0 +1,125 @@
+<style>
+.container{
+    height: 100%;
+    align-content: to-right;
+}
+
+.image_outer_container{
+    margin-top: auto;
+    margin-bottom: auto;
+    border-radius: 50%;
+    position: relative;
+}
+
+.image_inner_container{
+    border-radius: 50%;
+    padding: 0.3rem;
+    background: #833ab4; 
+    background: -webkit-linear-gradient(to bottom, #fcb045, #fd1d1d, #833ab4); 
+    background: linear-gradient(to bottom, #fcb045, #fd1d1d, #833ab4);
+}
+.image_inner_container img{
+    height: 3rem;
+    width: 3rem;
+    border-radius: 50%;
+    border: 0rem solid white;
+}
+
+.image_outer_container .green_icon{
+    background-color: #4cd137;
+    position: absolute;
+    right: 0.4rem;
+    bottom: 0;
+    height: 0.5rem;
+    width: 0.5rem;
+    border: 0rem solid white;
+    border-radius: 50%;
+}
+
+span.user-size {
+    font-size: 1rem;
+}
+a.chat-link {
+    text-decoration: none;
+}
+
+
+
+/* The fast, new way! */
+div.shadow-animated {
+  position: relative; /* For positioning the pseudo-element */
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+div.shadow-animated::before {
+  /* Position the pseudo-element. */
+  content: ' ';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  /* Create the box shadow at expanded size. */
+  box-shadow: 0 10px 50px 0 rgba(0, 0, 0, 0.5);
+
+  /* Hidden by default. */
+  opacity: 0;
+  transition: opacity 500ms;
+}
+
+div.shadow-animated:hover::before {
+  /* Show the pseudo-element on hover. */
+  opacity: 1;
+}
+
+input[type=text].wide-input {
+    width: 18rem;
+}
+
+div#userProfile {
+    cursor: pointer;
+}
+
+h3.results-title {
+    display: none;
+    border-bottom: 2px solid currentColor;
+}
+
+div#noUserFoundMessage, div#searchingUserFoundMessage {
+    display: none;
+}
+
+label[for="searchBox"] {
+    font-size: 1.2rem;
+    text-decoration: underline;
+}
+
+ul.description {
+  display: block;
+  list-style-type: square;
+  padding: 1rem;
+  margin-bottom: 0rem;
+}
+
+div.align-under-search {
+    margin-left: 32rem;
+}
+
+div.message-text {
+    align-items: center;
+}
+
+button#search_button {
+    margin-top: 0.2rem;
+}
+
+div.full-size {
+    height: 100%;
+}
+
+.fill {
+    width: 100%;
+}
+ 
+</style>

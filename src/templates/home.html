@@ -1,6 +1,37 @@
-{% extends "base.html" %}
+{% extends "home_base.html" %}
+
+{% block style %}
+    {% include 'home_css.html' %}
+{% endblock %}
 
 {% block content %}
+<header>
+    <h1>Change Your Life</h1>
+    <h2>Sign Up Today For ChitChat</h2>
+    <div>
+      <button id="Signup">Sign Up</button>
+      <button id="Login">Login</button>
+    </div>
+  </header>
+  
+  <main>
+    <h2>Learn More About Us</h2>
+    <section id="cards">
+      <section>
+        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/123865/dog1.png" alt="">
+        <h3>Always Improving</h3>
+        <p>ChitChat is an always-improving its communication platform that gains new features every month. Our world-class engineering team constantly iterates upon every facet of the ChitChat stack. Working on ChitChat means you get early access to the latest technologies.</p>
+        <a href="blah">Learn More Here &rarr;</a>
+      </section>
+       <section>
+        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/123865/dog2.png" alt="">
+        <h3>Global Scale</h3>
+         <p>ChitChat is an always-improving communication platform that gains new features every month. We obsess over every detail to provide you the best. Working on ChitChat means you get to stay in touch with people and dead lines more ofter.</p>
+         <a href="blah">Keep Reading Here  &rarr;</a>
+      </section>
+    </section>
+{% endblock %}
 
-<p class='lead'>Welcome Home</p>
+{% block script %}
+    {% include 'home_js.html' %}
 {% endblock %}

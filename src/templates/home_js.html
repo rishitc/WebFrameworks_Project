@@ -1,0 +1,9 @@
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    $("button#Signup").click(function() {
+        window.location.href = "{% url 'chat:signup' %}"
+    })
+    $("button#Login").click(function() {
+        window.location.href = "{% url 'chat:login' %}"
+    })
+</script>

@@ -1,0 +1,167 @@
+<script>
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+        
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+
+    var csrftoken = getCookie('csrftoken');
+
+//------------------------------------------------------------------------------------------------
+    // Getting the URL we need from Django and tricking it with a false username parameter so that it works!
+    const BASE_URL = "{% url 'chat:chatBox' 123 %}"
+    function listUsers(item, index) {
+        // Replacing the dummy parameter with a actual parameter that we need
+        let temp = BASE_URL
+        temp = temp.replace('123', item);
+        $("div.users.list-group").append(`<a href="${temp}" class="list-group-item list-group-item-action" target="_blank"> 
+                                            ${item}&nbsp;&nbsp;
+                                            <svg class="bi bi-chat-dots" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 0.2rem;">
+                                                <path fill-rule="evenodd" d="M2.678 11.894a1 1 0 01.287.801 10.97 10.97 0 01-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 01.71-.074A8.06 8.06 0 008 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894zm-.493 3.905a21.682 21.682 0 01-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 00.244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 01-2.347-.306c-.52.263-1.639.742-3.468 1.105z" clip-rule="evenodd"/>
+                                                <path d="M5 8a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0z"/>
+                                            </svg>
+                                        </a>`);
+    }
+
+    function noUserFound() {
+        $("div#noUserFoundMessage").css("display", "block")
+    }
+
+    function removeFromDOM(index) {
+        $( this ).remove();
+    }
+
+    function clearPreviousSearch() {
+        // Hide the error messages
+        $("div#noUserFoundMessage").css("display", "none")
+        $("div#searchingUserFoundMessage").css("display", "none")
+        $("h3.results-title").css("display", "none")
+
+        // Check if the users div contains any entries
+        // If so then delete them
+        oldUserList = $("div.users.list-group").children()
+        console.log(oldUserList.length)
+        if(oldUserList.length) {
+            oldUserList.each(removeFromDOM)
+        }
+    }
+
+    $("#searchBox").keyup(function(e) {
+        // If the enter key is pressed then I want to blur the
+        // search box
+        if(e.keyCode == 13) {
+            $("#searchBox").blur();
+        }
+    })
+    
+    let me = $("#myUsername").val()
+    $("#searchBox").change(function(e) {
+        console.log("Search Box contents updated!")
+        console.log("The search string is '" + e.target.value + "'")
+        searchString = e.target.value
+        // Convert the search string to lowercase
+        searchString = searchString.toLowerCase()
+    
+        userSearchRequest = {
+            "searchString": searchString,
+        }
+
+        // clear previous results and error messages
+        clearPreviousSearch()
+
+        // If the search string is valid
+        if(searchString.trim() && searchString != me) {
+            $.ajax({
+                type: "POST",
+                url:"/chitchat/search/username/",
+                dataType: "json",
+                data: userSearchRequest,
+                success: function(data) {
+                    console.log(data)
+                    console.log("Length of the user list: " + data.userList.length)
+                    if(data.userList.length != 0){
+                        // Setup the result list
+                        $("h3.results-title").css("display", "block")
+                        data.userList.forEach(listUsers);
+                    }
+                    else {
+                        // Setup the result list
+                        $("h3.results-title").css("display", "block")
+                        noUserFound()
+                    }
+                },
+
+            });
+        }
+        else if(searchString == me) {
+            // Setup the result list
+            $("h3.results-title").css("display", "block")
+            $("div#searchingUserFoundMessage").css("display", "block")
+        }
+    
+    });
+
+    let = searchForm = $("form#searchForm")
+    searchForm.submit(function(event) {
+        // Don't submit the form to Django
+        event.preventDefault()
+        clearPreviousSearch()
+        searchForm[0].reset()
+    })
+
+//---------------------------------------------------------------------------
+
+$("button#delete-button").click(function(event) {
+    let a = event.target.getAttribute("user")
+    let b = event.target.getAttribute("other_user")
+
+    dataText = {
+            "user": a,
+            "other_user": b
+            }
+
+    $.ajax({
+            type: "POST",
+            url:"/chitchat/threads/leave-thread/",
+            dataType: "json",
+            data: dataText,
+            success: function(data) {
+                console.log(data)
+                console.log("Status: " + data.status)
+                if(data.status == 200){
+                    console.log("Success")
+                    let temp = event.target.parentElement
+                    console.log(temp)
+                    temp.remove()
+                }
+                else {
+                    console.log("Failure")
+                }
+            },
+        });
+})
+</script>

@@ -1,10 +1,12 @@
 import asyncio
 import json
-from django.contrib.auth import get_user_model
 from channels.consumer import AsyncConsumer
 from channels.db import database_sync_to_async
+from channels.exceptions import StopConsumer
+import asgiref
+from channels.auth import get_user
 
-from .models import Thread, ChatMessage
+from .models import Thread, ChatMessage, CurrentChatRooms
 
 
 class ChatConsumer(AsyncConsumer):
@@ -21,20 +23,26 @@ class ChatConsumer(AsyncConsumer):
         print(thread_obj.id)
         chat_room = f"thread_{thread_obj.id}"
         self.chat_room = chat_room
+        # print(f"Chatroom: {chat_room}, {self.channel_name}, {type(self.channel_name)}")
         await self.channel_layer.group_add(
             chat_room,
             self.channel_name
         )
+        # logging the creation of a channel
+        await self.log_new_room(self.channel_name, chat_room)
         await self.send({
             "type": 'websocket.accept'
         })
 
     async def websocket_receive(self, event):
+        # prevent random logouts
+        get_user(self.scope)
         # When a message is received from the websocket
         print("receive", event)
         front_text = event.get("text", None)
         if front_text is not None:
-            loaded_dict_data = json.loads(front_text)
+            asyncJSONloads = asgiref.sync.sync_to_async(json.loads)
+            loaded_dict_data = await asyncJSONloads(front_text)
             msg = loaded_dict_data.get('message')
             print(msg)
 
@@ -71,6 +79,10 @@ class ChatConsumer(AsyncConsumer):
         # When a socket disconnects
         print("disconnected", event)
 
+        # removing the channel from the logs
+        await self.remove_old_room_log(self.channel_name)
+        raise StopConsumer()
+
     @database_sync_to_async
     def get_thread(self, user, other_user):
         return Thread.objects.get_or_new(user, other_user)[0]
@@ -81,3 +93,18 @@ class ChatConsumer(AsyncConsumer):
         user = self.me
         return ChatMessage.objects.create(thread=thread_obj, user=user,
                                           message=message)
+
+    @database_sync_to_async
+    def log_new_room(self, channel_layer_name, chat_room_name):
+        user = self.me
+        CurrentChatRooms.objects.\
+            add_new_Channel(user=user,
+                            sockets_channel_name=channel_layer_name,
+                            chat_room_name=chat_room_name)
+
+    @database_sync_to_async
+    def remove_old_room_log(self, channel_layer_name):
+        user = self.me
+        CurrentChatRooms.objects.\
+            deleteChannel(user=user,
+                          sockets_channel_name=channel_layer_name)

@@ -1,0 +1,43 @@
+<script>
+    // Togglling the green dot on the user profile icon
+    // and showing the dropdown options
+    $("div#userProfile").click(function() {
+        $("div#alert").toggleClass("green_icon");
+        $("div.list-group.profile-icon-list-group").children().toggleClass("profile-icon-dropdown-hide")
+    })
+
+    // when a dropdown item is clicked then we need to make it active
+    $("div.list-group.profile-icon-list-group").children().click(function(e) {
+        // We need to figure out what dropdown item was clicked
+        // If the logout button was clicked then log the user out
+        // by submitting the logout form
+        if(e.target.textContent == "Logout") {
+            e.preventDefault()
+            $("form.logout-form").submit()
+        }
+
+        e.target.classList.add("active")
+    })
+
+    // If the escape key is pressed the dropdown is hidden
+    $(document).keyup(function(e) {
+        if(e.keyCode == 27){
+            $("div#alert").toggleClass("green_icon");
+            $("div.list-group.profile-icon-list-group").children().addClass("profile-icon-dropdown-hide");
+        }
+    });
+
+    $(document).dblclick(function(event) {
+        $("div#alert").toggleClass("green_icon");
+        $("div.list-group.profile-icon-list-group").children().addClass("profile-icon-dropdown-hide");
+        event.preventDefault()
+    })
+
+    // Calling the tooltip function for the user profile hover-username effect
+    $('div#userProfile[data-toggle="tooltip"]').tooltip();  
+
+    // Clicking on the user link takes you back to the profile page
+    // profileIcon.click(function(e) {
+    //     window.location.href = "{% url 'chat:profile' %}";
+    // }) 
+</script>

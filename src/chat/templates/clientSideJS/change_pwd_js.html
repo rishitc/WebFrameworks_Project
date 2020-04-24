@@ -1,0 +1,8 @@
+<script>
+    // Calling the tooltip function for the user profile hover-username effect
+    $('button#reset-pwd-email').tooltip();  
+
+    $("button#reset-pwd-email").click(function(e) {
+        window.location.href = "{% url 'password_reset' %}"
+    })
+</script>

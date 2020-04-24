@@ -1,30 +1,73 @@
 {% extends "base.html" %}
 
+{% block style %}
+    {% include 'CSS/profileIcon_css.html' %}
+    {% include 'CSS/thread_css.html' %}
+{% endblock %}
+
+{% block headings %}
+    {% include 'chat/profileIcon.html' %}
+{%endblock%}
+
+{% block dropdown %}
+    <!--the dropdown menu-->
+    <div class="list-group profile-icon-list-group">
+        <a href="{% url 'chat:profile' %}" class="list-group-item list-group-item-action profile-icon-dropdown-hide">Profile</a>
+        <a href="{% url 'chat:logout' %}" class="list-group-item list-group-item-action profile-icon-dropdown-hide">Logout</a>
+    </div>
+
+    <!-- Hidden Logout form -->
+    <form action="{% url 'chat:logout' %}" method="post" class="logout-form">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+{% endblock %}
+
 {% block content %}
 
-<style>
-    ul {list-style-type: none;}
-    .card-body { overflow-y: auto; max-height: 500px;}
-</style>
+{% load emoji_tags %}
+{% load crispy_forms_tags %}
 <div class="card" id="chat-box">
     <div class="card-header">
-        Thread for {% if user != object.first %}{{ object.first }}{% else %}{{ object.second }}{% endif %}
+        <svg class="bi bi-chat-dots" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M2.678 11.894a1 1 0 01.287.801 10.97 10.97 0 01-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 01.71-.074A8.06 8.06 0 008 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894zm-.493 3.905a21.682 21.682 0 01-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 00.244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 01-2.347-.306c-.52.263-1.639.742-3.468 1.105z" clip-rule="evenodd"/>
+            <path d="M5 8a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0z"/>
+          </svg> Chatting with {% if user != object.first %}{{ object.first }}{% else %}{{ object.second }}{% endif %}&nbsp;&nbsp;&nbsp;<div class='float-right'><svg class="bi bi-card-list" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 00-.5.5v9a.5.5 0 00.5.5h13a.5.5 0 00.5-.5v-9a.5.5 0 00-.5-.5zm-13-1A1.5 1.5 0 000 3.5v9A1.5 1.5 0 001.5 14h13a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0014.5 2h-13z" clip-rule="evenodd"/>
+            <path fill-rule="evenodd" d="M5 8a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7A.5.5 0 015 8zm0-2.5a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5zm0 5a.5.5 0 01.5-.5h7a.5.5 0 010 1h-7a.5.5 0 01-.5-.5z" clip-rule="evenodd"/>
+            <circle cx="3.5" cy="5.5" r=".5"/>
+            <circle cx="3.5" cy="8" r=".5"/>
+            <circle cx="3.5" cy="10.5" r=".5"/>
+          </svg> <span id="message-count">{{object.chatmessage_set.all | length}}</span> <span id="message-pluralize">Message{{ object.chatmessage_set.all | length | pluralize:"s" }}</span> in this Thread</div>
     </div>
-    <div class="card-body">
+    <div class="card-body" id="chat-items-div">
         <ul class="list-group list-group-flush" id='chat-items'>
             {% for chat in object.chatmessage_set.all %}
-                <li class="list-group-item"><svg class="bi bi-person-square" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/>
-                    <path fill-rule="evenodd" d="M2 15v-1c0-1 1-4 6-4s6 3 6 4v1H2zm6-6a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
-                  </svg> <b class="text-muted">{{ chat.user }}</b> - {{ chat.message }}</li>
+                {% if chat.user == user %}
+                    <li class="list-group-item message-spacing">
+                        <svg class="bi bi-person-square" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/>
+                            <path fill-rule="evenodd" d="M2 15v-1c0-1 1-4 6-4s6 3 6 4v1H2zm6-6a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                        </svg>
+                            <span><b class="text-muted">{{ chat.user }}</b> - {{ chat.message | emoji_replace }}</span>
+                    </li>
+                {% else %}
+                    <li class="list-group-item list-group-item-secondary message-spacing">
+                        <svg class="bi bi-person-square" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/>
+                            <path fill-rule="evenodd" d="M2 15v-1c0-1 1-4 6-4s6 3 6 4v1H2zm6-6a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                        </svg>
+                            <span><b class="text-muted">{{ chat.user }}</b> - {{ chat.message | emoji_replace }}</span>
+                    </li>
+                {% endif %}
             {% endfor %}
         </ul>
     </div>
     <div class="card-footer text-muted">
         <form id='form' method='POST'> {% csrf_token %}
             <input type="hidden" value="{{ user.username }}" id="myUsername"/>
-            {{form.as_p }}
-            <input type='submit' class='btn btn-block btn-primary'/>
+            {{form.as_p}}
+            <input type='submit' class='btn btn-block btn-primary' id="submit_button"/>
         </form>
     </div>
 </div>
@@ -33,63 +76,6 @@
 {% endblock %}
 
 {% block script %}
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/reconnecting-websocket/1.0.0/reconnecting-websocket.js"></script>
-
-<script>
-// websocket scripts
-console.log(window.location)
-
-var loc = window.location
-var formData = $("#form")
-var msgInput = $("#id_message")
-var chatHolder = $("#chat-items")
-var me = $("#myUsername").val()
-
-formData.attr('autocomplete', 'off')
-
-var wsStart = 'ws://'
-if(loc.protocol == 'https:') {
-    wsStart = 'wss://'
-}
-var endpoint = wsStart + loc.host + loc.pathname
-var sockets = new ReconnectingWebSocket(endpoint)
-
-sockets.onmessage = function(e) {
-    console.log('message', e)
-
-    // Parsing the new chat data which contains
-    // 1. The message itself
-    // 2. The user who authored the message
-    let newChatData = JSON.parse(e.data)
-
-    /*For the messages by other users we need to communicate with backend*/
-    // creating an entry for a new message on the Browser window
-    let messageEntry = document.createElement("li")
-    messageEntry.textContent = "[" + newChatData.username + "] " + newChatData.message
-    // console.log(messageEntry)
-    // Putting the created entry on the DOM
-    chatHolder.append(messageEntry)
-    
-}
-sockets.onopen = function(e) {
-    console.log('open', e)
-    formData.submit(function(event){
-        event.preventDefault()
-        let msgText = msgInput.val()
-
-        let finalData = {
-            'message': msgText
-        }
-        sockets.send(JSON.stringify(finalData))
-        formData[0].reset()
-    })
-}
-sockets.onerror = function(e) {
-    console.log('error', e)
-}
-sockets.onclose = function(e) {
-    console.log('close', e)
-}
-</script>
+    {% include 'clientSideJS/threads_js.html' %}
+    {% include 'clientSideJS/profileIcon_js.html' %}
 {% endblock %}

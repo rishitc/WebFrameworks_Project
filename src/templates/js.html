@@ -2,3 +2,33 @@
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    //Helper function to extract the URL between the last '/' and before '?' 
+    //If URL is www.example.com/one/two/file.php?user=55 this function will return 'file.php' 
+    function refineURL()
+    {
+        //get full URL
+        var currURL= window.location.href; //get current address
+
+        //Get the URL between what's after '/' and befor '?' 
+        //1- get URL after'/'
+        // var afterDomain= currURL.substring(currURL.lastIndexOf('/') + 1);
+        //2- get the part before '?'
+        var afterBaseUrl = currURL.slice(window.location.origin.length);  
+        requiredQueryString = afterBaseUrl.split("?")[0]
+        return requiredQueryString;     
+    }
+
+    function clearGetParameters() {
+        //fetch new URL
+        //refineURL() gives us the freedom to alter the URL string based on our needs. 
+        var myNewURL = refineURL();
+
+        //here we pass the new URL extension we want to appear after the domains '/'.
+        // The previous identifiers or "query string" will be replaced. 
+        window.history.pushState("object or string", "Title", myNewURL );
+    }
+
+    setTimeout(clearGetParameters, 2000);
+</script>

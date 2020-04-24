@@ -13,7 +13,8 @@ application = ProtocolTypeRouter({
         AuthMiddlewareStack(
             URLRouter(
                 [
-                    url(r"^messages/(?P<username>[\w.@+-]+)/$", ChatConsumer),
+                    url(r"^chitchat/chatbox/(?P<username>[\w.@+-]+)/$",
+                        ChatConsumer),
                 ]
             )
         )

@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block style %}
+    {% include 'CSS/profile_css.html' %}
+    {% include 'CSS/profileIcon_css.html' %}
+    {% include 'CSS/div_alert_css.html'%}
+{% endblock %}
+
+
+{% block headings %}
+    {% include 'chat/profileIcon.html' %}
+{%endblock%}
+
+{% block dropdown %}
+    <!--the dropdown menu-->
+    <div class="list-group profile-icon-list-group">
+        <a href="{% url 'chat:edit_profile' %}" class="list-group-item list-group-item-action profile-icon-dropdown-hide">Edit Profile</a>
+        <a href="{% url 'chat:logout' %}" class="list-group-item list-group-item-action profile-icon-dropdown-hide">Logout</a>
+    </div>
+
+    <!-- Hidden Logout form -->
+    <form action="{% url 'chat:logout' %}" method="post" class="logout-form">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+{% endblock %}
+
+{% block content %}
+{% load crispy_forms_tags %}
+{% load emoji_tags %}
+
+<!-- Allow the user to search for other users -->
+<div class="d-flex flex-column">
+    <div class="p-2">
+        <div class="d-md-flex justify-content-between">
+            <div class="p-1">
+                <div class="card">
+                    <div class="card-body">
+                        <ul class="description">
+                            <li>Find new users, form the search menu provided.</li>
+                            <li>Only the top 10 results are returned.</li>
+                            <li>We hope you find whomever you are looking for &#128516;.</li>
+                        </ul>
+                    </div>
+                  </div>
+            </div>
+            <div class="p-1">
+                <form method="post" class="form-inline" id="searchForm">{% csrf_token %}
+                    <input type="hidden" value="{{ user.username }}" id="myUsername"/>
+                    <div class="form-group mx-sm-3 mb-2">
+                        {{form.as_p}}
+                    </div>
+                    <button type="submit" class="btn btn-danger" id="search_button">
+                        Clear&nbsp;&nbsp;
+                        <svg class="bi bi-backspace" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M6.603 2h7.08a1 1 0 011 1v10a1 1 0 01-1 1h-7.08a1 1 0 01-.76-.35L1 8l4.844-5.65A1 1 0 016.603 2zm7.08-1a2 2 0 012 2v10a2 2 0 01-2 2h-7.08a2 2 0 01-1.519-.698L.241 8.65a1 1 0 010-1.302L5.084 1.7A2 2 0 016.603 1h7.08z" clip-rule="evenodd"/>
+                            <path fill-rule="evenodd" d="M5.83 5.146a.5.5 0 000 .708l5 5a.5.5 0 00.707-.708l-5-5a.5.5 0 00-.708 0z" clip-rule="evenodd"/>
+                            <path fill-rule="evenodd" d="M11.537 5.146a.5.5 0 010 .708l-5 5a.5.5 0 01-.708-.708l5-5a.5.5 0 01.707 0z" clip-rule="evenodd"/>
+                          </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="p-2">
+        <div class="d-md-flex justify-content-around">
+            <div class="p-1">
+                
+            </div>
+            <div class="p-1 align-under-search">
+                <div class="list-group d-inline-flex p-2">
+                    <h3 class="results-title">Matching search results:</h3>
+                    <div class="alert alert-danger" role="alert" id="noUserFoundMessage">
+                        <svg class="bi bi-exclamation-circle" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M8 15A7 7 0 108 1a7 7 0 000 14zm0 1A8 8 0 108 0a8 8 0 000 16z" clip-rule="evenodd"/>
+                            <path d="M7.002 11a1 1 0 112 0 1 1 0 01-2 0zM7.1 4.995a.905.905 0 111.8 0l-.35 3.507a.552.552 0 01-1.1 0L7.1 4.995z"/>
+                        </svg>&nbsp;&nbsp;
+                        No matching user found!
+                    </div>
+                    <div class="alert alert-danger" role="alert" id="searchingUserFoundMessage">
+                        <svg class="bi bi-exclamation-circle" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M8 15A7 7 0 108 1a7 7 0 000 14zm0 1A8 8 0 108 0a8 8 0 000 16z" clip-rule="evenodd"/>
+                            <path d="M7.002 11a1 1 0 112 0 1 1 0 01-2 0zM7.1 4.995a.905.905 0 111.8 0l-.35 3.507a.552.552 0 01-1.1 0L7.1 4.995z"/>
+                        </svg>&nbsp;&nbsp;
+                        Why are you searching for yourself. You are {{user.username}}
+                    </div>
+                    <div class="users list-group"></div>
+                </div>
+            </div>
+	    </div>
+    </div>
+</div>
+
+<!-- Show the user the existing chat threads -->
+<div class='container'>
+    <div class='d-flex border-bottom my-3 py-3 flex-row justify-content-between align-items-stretch'>
+        <div class='p-1'>
+            <h1 class='p-0 m-0'>Your Existing Threads</h1>
+        </div>
+    </div>
+        {% comment "We first check if the user has any previous chat threads" %}{% endcomment %}
+        {% if userChatList %}
+            {% comment "If they have previous threads, then we display them" %}{% endcomment %}
+            {% for user1, user2 in userChatList %}
+            <div class="d-flex my-3 py-3 flex-row justify-content-between align-items-stretch">
+                {% if user1 %}
+                    <div class="col-sm-6">
+                        <div>
+                            <a href="{% url 'chat:chatBox' user1.other_user %}" class="chat-link" target="_blank">
+                                <div class="card text-center text-white bg-dark mb-3 shadow-animated full-size">
+                                    <div class="card-header">
+                                        <b class="align-bottom">Thread with:</b>&nbsp;&nbsp;
+                                        <span class="badge badge-pill badge-light user-size align-bottom">{{ user1.other_user }}</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="card-text d-flex justify-content-center message-text full-size"><b>{{ user1.latest_message.user }}</b>&nbsp;&nbsp;-&nbsp;&nbsp;{{ user1.latest_message.message | emoji_replace }}</div>
+                                    </div>
+                                    <div class="card-footer">
+                                        {{ user1.latest_message.timestamp }}
+                                    </div>
+                                </div>
+                            </a>
+                            <button type="button" class="btn btn-danger fill" user="{{user.username}}" other_user="{{user1.other_user}}" id="delete-button">
+                                Delete Thread with {{user1.other_user}}&nbsp;&nbsp;
+                                <svg class="bi bi-trash-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M2.5 1a1 1 0 00-1 1v1a1 1 0 001 1H3v9a2 2 0 002 2h6a2 2 0 002-2V4h.5a1 1 0 001-1V2a1 1 0 00-1-1H10a1 1 0 00-1-1H7a1 1 0 00-1 1H2.5zm3 4a.5.5 0 01.5.5v7a.5.5 0 01-1 0v-7a.5.5 0 01.5-.5zM8 5a.5.5 0 01.5.5v7a.5.5 0 01-1 0v-7A.5.5 0 018 5zm3 .5a.5.5 0 00-1 0v7a.5.5 0 001 0v-7z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if user2 %}
+                <div class="col-sm-6">
+                    <div>
+                        <a href="{% url 'chat:chatBox' user2.other_user %}" rel="noopener noreferrer" class="chat-link" target="_blank">
+                            <div class="card text-center text-white bg-dark mb-3 shadow-animated full-size">
+                                <div class="card-header">
+                                    <b class="align-bottom">Thread with:</b>&nbsp;&nbsp;
+                                    <span class="badge badge-pill badge-light user-size align-bottom">{{ user2.other_user }}</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="card-text d-flex justify-content-center message-text full-size"><b>{{ user2.latest_message.user }}</b>&nbsp;&nbsp;-&nbsp;&nbsp;{{ user2.latest_message.message | emoji_replace }}</div>
+                                </div>
+                                <div class="card-footer">
+                                    {{ user2.latest_message.timestamp }}
+                                </div>
+                            </div>
+                        </a>
+                        <button type="button" class="btn btn-danger fill" user="{{user.username}}" other_user="{{user2.other_user}}" id="delete-button">
+                            Delete Thread with {{user2.other_user}}&nbsp;&nbsp;
+                            <svg class="bi bi-trash-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M2.5 1a1 1 0 00-1 1v1a1 1 0 001 1H3v9a2 2 0 002 2h6a2 2 0 002-2V4h.5a1 1 0 001-1V2a1 1 0 00-1-1H10a1 1 0 00-1-1H7a1 1 0 00-1 1H2.5zm3 4a.5.5 0 01.5.5v7a.5.5 0 01-1 0v-7a.5.5 0 01.5-.5zM8 5a.5.5 0 01.5.5v7a.5.5 0 01-1 0v-7A.5.5 0 018 5zm3 .5a.5.5 0 00-1 0v7a.5.5 0 001 0v-7z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-danger" role="alert">
+                Looks like you have not started any chat, search for a user and begin chatting.&nbsp;&nbsp;&#128515;
+            </div>
+        {% endif %}
+</div>
+
+
+<!-- User alerts -->
+<div class="alert alert-success on-load medium" role="alert">
+    <p class="text-center font-weight-normal mb-0 pb-0">
+        {% if request.GET.status %}
+            {% if request.GET.status == 'success_pwd_chg' %}
+                Password Changed Successfully!&nbsp;&nbsp;&#128516;
+            {% elif request.GET.status == 'success_det_chg' %}
+                User Details Changed Successfully!&nbsp;&nbsp;&#128516;
+            {% elif request.GET.status == 'success_user_login' %}
+                Nice to see you again {{object.username}}.&nbsp;&nbsp;&#128526;
+            {% elif request.GET.status == 'success_user_register' %}
+                Hi, there! Welcome to ChitChat!&nbsp;&nbsp;&#128525;
+            {% elif request.GET.status == 'user_already_logged_in' %}
+                Hey! Your already logged in!&nbsp;&nbsp;&#128514;
+            {% endif %}
+        {% else %}
+            Welcome back {{object.username}}.&nbsp;&nbsp;&#128512;
+        {% endif %}
+    </p>
+</div>
+
+{% endblock %}
+
+{% block script %}
+    {% include 'clientSideJS/profile_js.html' %}
+    {% include 'clientSideJS/profileIcon_js.html' %}
+{% endblock %}

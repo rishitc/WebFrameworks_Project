@@ -1,0 +1,143 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reconnecting-websocket/1.0.0/reconnecting-websocket.js"></script>
+{% load static %}
+{% load emoji_tags %}
+    <script src="{% static 'emoji/js/emoji.js' %}"></script>
+
+<script>
+    Emoji.setDataUrl('{% url 'emoji:list.json' %}').load();
+
+    // websocket scripts
+    console.log(window.location)
+
+    let scrollAllowed = true
+
+    var loc = window.location
+    var formData = $("#form")
+    var msgInput = $("#id_message")
+    var submitButton = $("#submit_button")
+    var chatHolder = $("#chat-items")
+    var chatHolderDiv = $("#chat-items-div")
+    var me = $("#myUsername").val()
+    var profileIcon = $("div.image_outer_container")
+
+    formData.attr('autocomplete', 'off')
+    chatHolderDiv.scrollTop(chatHolder.height())
+
+    var wsStart = 'ws://'
+    if(loc.protocol == 'https:') {
+        wsStart = 'wss://'
+    }
+    var endpoint = wsStart + loc.host + loc.pathname
+    var sockets = new ReconnectingWebSocket(endpoint)
+
+    function createSVGTag() {
+        ele = `<svg class="bi bi-person-square" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"> <path fill-rule="evenodd" d="M14 1H2a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V2a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z" clip-rule="evenodd"/><path fill-rule="evenodd" d="M2 15v-1c0-1 1-4 6-4s6 3 6 4v1H2zm6-6a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>`
+
+        return ele
+    }
+
+    function createLiTag(username) {
+        // getting the current user
+        let me = "{{ user }}"
+        let ele = document.createElement("li")
+        ele.setAttribute("class", "message-spacing list-group-item")
+         // If I am the username then my li needs to have the class of list-group-item
+         if(me == username) {
+            // We have nothing to do here right now, but can use this in the future
+        } else { // If I am the not the username then my li needs to have the class of list-group-item-secondary
+            ele.classList.add("list-group-item-secondary")
+        }
+        return ele
+    }
+
+    function createTextLine(username, message) {  
+        let ele = document.createElement("span")
+        let ele_b = document.createElement("b")
+        ele_b.setAttribute("class", "text-muted")
+        ele_b.textContent = username
+        ele.append(ele_b, " - ")
+        ele.innerHTML += message
+        return ele
+    }
+
+    function createMessageLine(username, message) {
+        let SVGParent = createSVGTag(), liTag = createLiTag(username)
+        let messageLine = createTextLine(username, message)
+        liTag.innerHTML = SVGParent + " "
+        liTag.append(messageLine)
+        return liTag
+    }
+
+    sockets.onmessage = function(e) {
+        console.log('message', e)
+
+        // getting the current user
+        let me = "{{ user }}"
+        // Incrementing the count of the number of messages
+        let msgCountEle = $("span#message-count")
+        let msgCount = Number(msgCountEle.text())
+        ++msgCount
+        // Update the counter
+        msgCountEle.text(msgCount)
+        
+        // Checking the grammar of the Message(s) text displayed
+        let msgTextEle = $("span#message-pluralize")
+        let msgText = $.trim(msgTextEle.text())
+        if(msgText == "Message" && msgCount != 1) {
+            msgTextEle.text("Messages")
+        } else if (msgText == "Messages" && msgCount == 1) {
+            msgTextEle.text("Message")
+        }
+
+        // Parsing the new chat data which contains
+        // 1. The message itself
+        // 2. The user who authored the message
+        let newChatData = JSON.parse(e.data)
+
+        /*For the messages by other users we need to communicate with backend*/
+        // creating an entry for a new message on the Browser window
+        // console.log(Emoji.replace(newChatData.message))
+        let messageEntry = createMessageLine(newChatData.username, Emoji.replace(newChatData.message))
+        // console.log(messageEntry)
+        // Putting the created entry on the DOM
+        chatHolder.append(messageEntry)
+
+       
+        // If we have typed a message or if scrollAllowed == true, we get scrolled to the bottom
+        // of the chat thread
+        if(me == newChatData.username || scrollAllowed == true) {
+            // Scroll to the bottom of the chat div
+            chatHolderDiv.scrollTop(chatHolder.height())
+        }
+    }
+    sockets.onopen = function(e) {
+        console.log('open', e)
+        formData.submit(function(event){
+            event.preventDefault()
+            let msgText = $.trim(msgInput.val())
+
+            let finalData = {
+                'message': msgText
+            }
+            sockets.send(JSON.stringify(finalData))
+            formData[0].reset()
+        })
+    }
+    sockets.onerror = function(e) {
+        console.log('error', e)
+    }
+    sockets.onclose = function(e) {
+    console.log('close', e)
+}
+
+         // If our mouse is hovering in the message thread div then don't scroll down
+        // this is set by the scrollAllowed variable
+        $( "div#chat-items-div" ).hover(
+        function() {
+            scrollAllowed = false
+        }, function() {
+            scrollAllowed = true
+        }
+        );
+
+</script>

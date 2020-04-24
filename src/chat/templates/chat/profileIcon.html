@@ -1,0 +1,15 @@
+{% load static %}
+<div class="container">
+    <div class="d-flex h-100" id="userProfile" data-toggle="tooltip" data-placement="left" title="{{user.username}}">
+        <div class="image_outer_container">
+            <div class="" id="alert"></div> <!-- add class green_icon to get a green icon on the user profile-->
+            <div class="image_inner_container">
+                {% if user.userprofile.profile_image %}
+                    <img src="{{ user.userprofile.profile_image.url }}"/>
+                {% else %}
+                    <img src="{% static 'default.jpg' %}"/>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
